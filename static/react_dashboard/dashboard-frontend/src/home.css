@@ -1,0 +1,225 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 50%, #d4c4a8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+      
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(139, 117, 84, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(160, 142, 115, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 4rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            color: #5A4D3A;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(139, 117, 84, 0.3);
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #4A3F32;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: #5A4D3A;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .option-card {
+            background: linear-gradient(145deg, #f0e4d1, #e6d8c5);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 
+                0 15px 35px rgba(139, 117, 84, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .option-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(139, 117, 84, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .option-card:hover::before {
+            animation: shimmer 0.8s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .option-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 
+                0 25px 50px rgba(139, 117, 84, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .option-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            color: #5A4D3A;
+            filter: drop-shadow(2px 2px 4px rgba(139, 117, 84, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover .option-icon {
+            transform: scale(1.2) rotate(5deg);
+            color: #6D5D47;
+        }
+
+        .option-title {
+            font-size: 1.8rem;
+            color: #3D332A;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .option-card:hover .option-title {
+            color: #5A4D3A;
+        }
+
+        .option-description {
+            font-size: 1rem;
+            color: #4A3F32;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .option-button {
+            background: linear-gradient(135deg, #8B7554, #A0917B);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 117, 84, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .option-button:hover {
+            background: linear-gradient(135deg, #A0917B, #B8A68D);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 117, 84, 0.4);
+        }
+
+        .footer {
+            margin-top: 4rem;
+            color: #4A3F32;
+            font-size: 0.9rem;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .option-card {
+                padding: 2rem 1.5rem;
+            }
+        }
