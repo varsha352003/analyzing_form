@@ -64,7 +64,7 @@ def admin_login():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    session.pop('admin', None)  # Fix here
+    session.pop('admin', None) 
     return jsonify({'success': True})
 
 @app.route('/api/submit_feedback', methods=['POST'])
