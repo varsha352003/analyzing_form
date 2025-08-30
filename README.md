@@ -38,3 +38,28 @@ Data Handling: Pandas
 Library: React.js
 
 Styling: Plain CSS with a professional green and white theme.
+
+## Project Structure
+analyzing_feedback/
+├── app.py                    # Flask application
+├── utils/
+│   └── nlp_feedback_analysis.py  # NLP processing utilities
+├── static/
+│   └── react_dashboard/      # React frontend
+├── templates/                # Flask templates
+├── requirements.txt          # Python dependencies
+└── README.md                # Project documentation
+
+## Running the Application
+1. Start Flask Backend
+   python app.py
+2. Start React Frontend
+   cd static/react_dashboard/dashboard-frontend
+   npm start
+
+### Acknowledgements
+-Acknowledgments
+-BERTopic
+-LangChain
+-React.js
+-Flask
