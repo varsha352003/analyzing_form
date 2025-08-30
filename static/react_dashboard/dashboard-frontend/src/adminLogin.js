@@ -18,11 +18,13 @@ function AdminLogin() {
         credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
-      if (response.ok) {
-        navigate('/dashboard');
-      } else {
-        setError('Invalid username or password');
-      }
+     
+if (response.ok) {
+  navigate('/admin/menu');  
+} else {
+  setError('Invalid username or password');
+}
+
     } catch (err) {
       setError('Server error. Please try again.');
     }
@@ -48,13 +50,7 @@ function AdminLogin() {
           <p className="page-subtitle">
             Secure login for administrators to access feedback dashboard, analytics, and management tools.
           </p>
-          <ul className="features-list">
-            <li>Comprehensive feedback analytics</li>
-            <li>Course performance insights</li>
-            <li>Sentiment analysis reports</li>
-            <li>User management tools</li>
-            <li>Export and reporting features</li>
-          </ul>
+          
           <div className="security-info">
             <h3>Security Notice</h3>
             <p>

@@ -1,232 +1,253 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
+import './dashboard.css';
 import {
-  BarChart,
-  Bar,
+  Star,
+  MessageCircle,
+  BarChart3,
+  Home,
+  BookOpen,
+  Users,
+  Settings,
+  Bell,
+  Search,
+  Eye
+} from 'lucide-react';
+import {
   LineChart,
   Line,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
   ResponsiveContainer
 } from 'recharts';
-import {
-  TrendingUp,
-  Users,
-  Star,
-  MessageCircle,
-  BookOpen,
-  Calendar,
-  Filter,
-  BarChart as BarChartIcon
-} from 'lucide-react';
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
- useEffect(() => {
-  fetch('http://localhost:5000//api/analysis', {
-    method: 'GET',
-    credentials: 'include',
-  })
-    .then(res => {
-      if (res.status === 401) {
+  useEffect(() => {
+    fetch('http://localhost:5000/api/analysis', {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(res => {
+        if (res.status === 401) {
+          window.location.href = '/admin/login';
+          return null;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (!data) return;
+        console.log('Received data:', data); 
         
-        window.location.href = '/admin/login';
-        return null;
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data) return;
-      const courses = Object.keys(data.summary || {});
-      setSelectedCourse(courses[0] || '');
-      setDashboardData(data);
-    })
-    .catch(err => console.error('API error:', err));
-}, []);
+        
+        const processedData = {
+          summary: data.summary || {},
+          average_rating: data.average_rating || {},
+          sentiment_distribution: data.sentiment_distribution || {},
+          sentiment_monthly: data.sentiment_monthly || [],
+          rating_monthly: data.rating_monthly || [],
+          views: data.views || {}
+        };
+        
+        const courses = Object.keys(processedData.summary);
+        if (courses.length > 0) {
+          setSelectedCourse(courses[0]);
+        }
+        setDashboardData(processedData);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('API error:', err);
+        setError('Failed to load dashboard data');
+        setLoading(false);
+      });
+  }, []);
 
-  const currentData = dashboardData && selectedCourse
-    ? {
-        summary: {
-          avgRating: dashboardData.average_rating[selectedCourse],
-          totalReviews: Object.values(dashboardData.sentiment_distribution[selectedCourse] || {}).reduce((a, b) => a + b, 0),
-          totalStudents: 100,
-          completion: 85,
-        },
-        sentiment: ["Negative", "Neutral", "Positive"].map(label => ({
-          name: label,
-          value: dashboardData.sentiment_distribution[selectedCourse]?.[label] || 0,
-          color:
-            label === "Negative" ? "#EF4444" :
-            label === "Neutral" ? "#F59E0B" :
-            "#10B981"
-        })),
-        monthlyRating: dashboardData.rating_monthly
-          .filter(item => item.course === selectedCourse)
-          .map(item => ({
-            month: item.month,
-            rating: item.average_rating,
-          })),
-        monthlySentiment: dashboardData.sentiment_monthly
-          .filter(item => item.course === selectedCourse)
-          .map(item => ({
-            month: item.month,
-            positive: item.Positive || 0,
-            neutral: item.Neutral || 0,
-            negative: item.Negative || 0,
-          })),
-        courses: Object.keys(dashboardData.summary).map(course => ({
-          course,
-          avgRating: dashboardData.average_rating[course],
-          totalReviews: Object.values(dashboardData.sentiment_distribution[course] || {}).reduce((a, b) => a + b, 0),
-          students: 100,
-          completion: 85,
-          trend: "↑ better",
-        }))
-      }
-    : null;
 
-  const topMetrics = currentData ? [
-    { title: 'Total Students', value: currentData.summary.totalStudents, icon: Users, color: 'from-blue-500 to-blue-600', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
-    { title: 'Average Rating', value: currentData.summary.avgRating.toFixed(1), icon: Star, color: 'from-yellow-500 to-yellow-600', iconBg: 'bg-yellow-100', iconColor: 'text-yellow-600' },
-    { title: 'Total Reviews', value: currentData.summary.totalReviews, icon: MessageCircle, color: 'from-purple-500 to-purple-600', iconBg: 'bg-purple-100', iconColor: 'text-purple-600' },
-    { title: 'Completion Rate', value: `${currentData.summary.completion}%`, icon: BookOpen, color: 'from-green-500 to-green-600', iconBg: 'bg-green-100', iconColor: 'text-green-600' }
-  ] : [];
+  const getSentimentData = (course) => {
+    const distribution = dashboardData?.sentiment_distribution?.[course];
+    if (!distribution) return [];
+    
+    return ["Negative", "Neutral", "Positive"].map(label => ({
+      name: label,
+      value: distribution[label] || 0,
+      color:
+        label === "Negative" ? "#EF4444" :
+        label === "Neutral" ? "#F59E0B" :
+        "#14532d"
+    }));
+  };
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="text-slate-700 font-medium">{`${label}`}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-slate-600" style={{ color: entry.color || '#475569' }}>
-              {`${entry.name}: ${entry.value}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
+
+  const getTotalReviews = (course) => {
+    const distribution = dashboardData?.sentiment_distribution?.[course];
+    if (!distribution) return 0;
+    return Object.values(distribution).reduce((a, b) => a + b, 0);
+  };
+
+ 
+  const getMonthlyRating = (course) => {
+    if (!dashboardData?.rating_monthly) return [];
+    return dashboardData.rating_monthly
+      .filter(item => item.course === course)
+      .map(item => ({
+        month: item.month,
+        rating: item.average_rating || 0,
+      }));
+  };
+
+
+  const getMonthlySentiment = (course) => {
+    if (!dashboardData?.sentiment_monthly) return [];
+    return dashboardData.sentiment_monthly
+      .filter(item => item.course === course)
+      .map(item => ({
+        month: item.month,
+        positive: item.Positive || 0,
+        neutral: item.Neutral || 0,
+        negative: item.Negative || 0,
+      }));
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
+
+  if (!dashboardData || !selectedCourse) {
+    return <div className="error">No data available</div>;
+  }
+
+  const currentData = {
+    avgRating: dashboardData.average_rating[selectedCourse] || 0,
+    totalReviews: getTotalReviews(selectedCourse),
+    sentiment: getSentimentData(selectedCourse),
+    monthlyRating: getMonthlyRating(selectedCourse),
+    monthlySentiment: getMonthlySentiment(selectedCourse),
+    summary: dashboardData.summary[selectedCourse] || "No summary available.",
+    views: dashboardData.views[selectedCourse] || 0
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-orange-600 mb-2">Course Analytics Dashboard</h1>
-          <p className="text-slate-600 text-lg">Monitor course performance, ratings, and student sentiment</p>
-        </div>
+    <div className="dashboard-container">
+      <aside className="sidebar">
+        <div className="logo">FeedAnalytics</div>
+        <ul className="sidebar-menu">
+      
+          
+        </ul>
+      </aside>
 
-        {dashboardData && (
-          <div className="mb-8">
-            <div className="bg-white/80 p-4 rounded-xl shadow-lg">
-              <div className="flex items-center gap-3">
-                <Filter className="w-5 h-5 text-orange-600" />
-                <label className="text-slate-700 font-medium">Select Course:</label>
-                <select
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-                  className="px-4 py-2 border rounded-lg text-slate-700"
-                >
-                  {Object.keys(dashboardData.summary).map((course) => (
-                    <option key={course} value={course}>{course}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {topMetrics.map((metric, index) => (
-            <div key={index} className="bg-white/80 p-6 rounded-xl shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-600 text-sm font-medium mb-1">{metric.title}</p>
-                  <p className={`text-3xl font-bold bg-gradient-to-r ${metric.color} bg-clip-text text-transparent`}>
-                    {metric.value}
-                  </p>
-                </div>
-                <div className={`p-3 ${metric.iconBg} rounded-lg`}>
-                  <metric.icon className={`w-6 h-6 ${metric.iconColor}`} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {currentData && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2 bg-white/80 p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-bold text-slate-700 mb-4">Course Performance Summary</h3>
-              <div className="space-y-4">
-                {currentData.courses.map((course, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <h4 className="font-semibold text-slate-700 mb-1">{course.course}</h4>
-                    <div className="text-sm text-slate-600 flex gap-4">
-                      <span>{course.students} students</span>
-                      <span>{course.avgRating} rating</span>
-                      <span>{course.totalReviews} reviews</span>
-                    </div>
-                    <div className="text-right text-green-600 font-bold mt-2">{course.completion}%</div>
-                  </div>
+      <main className="main-content">
+        <header className="dashboard-header">
+          <h1 className="dashboard-title">Dashboard</h1>
+          <div className="controls">
+            
+            <label className="dropdown-label">
+              Select Course:
+              <select 
+                className="course-dropdown styled-dropdown"
+                value={selectedCourse} 
+                onChange={e => setSelectedCourse(e.target.value)}>
+                {Object.keys(dashboardData.summary).map(course => (
+                  <option key={course} value={course}>{course}</option>
                 ))}
-              </div>
-            </div>
+              </select>
+            </label>
+          </div>
+        </header>
 
-            <div className="bg-white/80 p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-bold text-slate-700 mb-4">Sentiment Distribution</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie data={currentData.sentiment} dataKey="value" cx="50%" cy="50%" innerRadius={60} outerRadius={100}>
-                    {currentData.sentiment.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
+        <section className="cards-container">
+          <div className="card">
+            <Star />
+            <div>
+              <h2>{currentData.avgRating.toFixed(1)}</h2>
+              <p>Average Rating</p>
             </div>
           </div>
-        )}
-
-        {currentData && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white/80 p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-bold text-slate-700 mb-4">Monthly Rating Changes</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={currentData.monthlyRating}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis domain={[3.5, 5]} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Line type="monotone" dataKey="rating" stroke="#3B82F6" strokeWidth={3} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="bg-white/80 p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-bold text-slate-700 mb-4">Monthly Sentiment Changes</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={currentData.monthlySentiment}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="positive" stackId="a" fill="#10B981" />
-                  <Bar dataKey="neutral" stackId="a" fill="#F59E0B" />
-                  <Bar dataKey="negative" stackId="a" fill="#EF4444" />
-                </BarChart>
-              </ResponsiveContainer>
+          <div className="card">
+            <MessageCircle />
+            <div>
+              <h2>{currentData.totalReviews}</h2>
+              <p>Total Reviews</p>
             </div>
           </div>
-        )}
-      </div>
+          
+          <div className="card">
+            <BarChart3 />
+            <div>
+              <h2>Summary</h2>
+              <p>{currentData.summary}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="charts-grid-horizontal">
+          <div className="chart-card">
+            <h3>Monthly Average Rating</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={currentData.monthlyRating}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="rating" stroke="#14532d" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="chart-card">
+            <h3>Monthly Sentiment Changes</h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={currentData.monthlySentiment}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="positive" stackId="a" fill="#14532d" />
+                <Bar dataKey="neutral" stackId="a" fill="#F59E0B" />
+                <Bar dataKey="negative" stackId="a" fill="#EF4444" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        <section className="charts-grid-full">
+          <div className="chart-card">
+            <h3>Sentiment Distribution</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie 
+                  data={currentData.sentiment} 
+                  dataKey="value" 
+                  cx="50%" 
+                  cy="50%" 
+                  innerRadius={60} 
+                  outerRadius={100}>
+                  {currentData.sentiment.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };

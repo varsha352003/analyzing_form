@@ -44,7 +44,7 @@ const HomePage = () => {
       </div>
 
       <div className="footer">
-        <p>&copy; 2025 EduHub. Empowering education through technology.</p>
+        <p>&copy; 2025 FeedUp. Empowering education through technology.</p>
       </div>
     </div>
   );

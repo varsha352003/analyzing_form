@@ -4,22 +4,22 @@ from datetime import date
 from werkzeug.security import check_password_hash
 from flask_cors import CORS
 from utils.nlp_feedback_analysis import run_feedback_analysis, get_sentiment_timeseries, clean_text
+from utils.nlp_feedback_analysis import perform_advanced_topic_modeling
 import pandas as pd
 import os
-
-from flask_cors import CORS
-
-
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True  
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False
 
 db = SQLAlchemy(app)
-CORS(app, supports_credentials=True)
-
+CORS(app, 
+     supports_credentials=True, 
+     origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+     allow_headers=["Content-Type"],
+     methods=["GET", "POST"])
 
 
 REACT_BUILD_PATH = os.path.join('static', 'react_dashboard', 'dashboard-frontend', 'build')
@@ -38,7 +38,6 @@ class Feedback(db.Model):
     date_submitted = db.Column(db.Date, default=date.today)
 
 
-
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
@@ -49,6 +48,11 @@ def serve_react(path):
         
         return send_from_directory(REACT_BUILD_PATH, 'index.html')
 
+@app.route('/api/check-auth', methods=['GET'])
+def check_auth():
+    if 'admin' in session:
+        return jsonify({'authenticated': True, 'username': session['admin']})
+    return jsonify({'authenticated': False}), 401
 
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
@@ -84,39 +88,71 @@ def submit_feedback():
 
     return jsonify({'success': True})
 
+
+@app.route('/api/analyze_topics', methods=['POST'])
+def analyze_topics():
+    if 'admin' not in session:
+        return jsonify({'message': 'Unauthorized'}), 401
+    try:
+        data = request.get_json()
+        if not data or "feedback" not in data or not isinstance(data["feedback"], list):
+            return jsonify({"error": "Request must be JSON with a 'feedback' key containing a list of objects."}), 400
+
+        feedback_list = data["feedback"]
+        if not feedback_list:
+            return jsonify({"error": "The 'feedback' list cannot be empty."}), 400
+
+        df = pd.DataFrame(feedback_list)
+
+        if 'course' not in df.columns or 'feedback_text' not in df.columns:
+            return jsonify({"error": "Each object in 'feedback' must have 'course' and 'feedback_text' keys."}), 400
+
+       
+        min_feedback_count = data.get("min_feedback_count", 5)
+
+        results = perform_advanced_topic_modeling(df, min_feedback_count=min_feedback_count)
+
+        return jsonify(results), 200 #
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Unexpected server error: {str(e)}"}), 500
+
 @app.route('/api/analysis', methods=['GET'])
 def api_analysis():
     if 'admin' not in session:
         return jsonify({'message': 'Unauthorized'}), 401
 
     feedbacks = Feedback.query.all()
+    if not feedbacks:
+        return jsonify({
+            "summary": {},
+            "average_rating": {},
+            "sentiment_distribution": {},
+            "feedback_data": [] 
+        })
+
     data = [{
+        'id': f.id, 
         'course': f.course,
         'rating': f.rating,
         'feedback_text': f.feedback_text,
-        'date_submitted': f.date_submitted
+        'date_submitted': f.date_submitted.isoformat()
     } for f in feedbacks]
 
+   
     df = pd.DataFrame(data)
-    df['cleaned'] = df['feedback_text'].apply(clean_text)
     df['date_submitted'] = pd.to_datetime(df['date_submitted'])
-    df['month'] = df['date_submitted'].dt.strftime('%Y-%m')
 
-    result = run_feedback_analysis(df)
-    sentiment_monthly = get_sentiment_timeseries(df).to_dict(orient='records')
-    avg_rating_monthly = (
-        df.groupby(['course', 'month'])['rating']
-        .mean().round(1).reset_index()
-        .rename(columns={'rating': 'average_rating'})
-        .to_dict(orient='records')
-    )
+    all_courses = df['course'].unique().tolist()
+    active_courses = len(all_courses)
+    total_feedback = len(df)
 
     return jsonify({
-        "summary": result["summary"],
-        "average_rating": result["average_rating"].to_dict(),
-        "sentiment_distribution": result["sentiment_distribution"].to_dict(),
-        "sentiment_monthly": sentiment_monthly,
-        "rating_monthly": avg_rating_monthly
+        "total_feedback": total_feedback,
+        "active_courses": active_courses,
+        "feedback_data": data
     })
 
 

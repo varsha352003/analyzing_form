@@ -1,19 +1,35 @@
+# Web Framework
 Flask
 Flask-SQLAlchemy
 Flask-Cors
 Werkzeug
-pandas
-transformers
-torch
-spacy
 
+# Data Processing
+pandas
+numpy
+
+# Machine Learning & NLP
+torch
+transformers
+sentence-transformers
+bertopic
+spacy
+nltk
+
+# Additional ML libraries
+scikit-learn
+huggingface-hub
+
+# API Integration
+langchain_groq
+groq
+langchain
+
+# Utilities
 python-dotenv
-Flask==2.3.2
-Flask-SQLAlchemy==3.1.1
-Flask-Cors==4.0.0
-Werkzeug==2.3.6
-pandas==2.1.0
-transformers==4.40.1
-torch==2.2.2
-spacy==3.7.2
-python-dotenv==1.0.0
+
+# Visualization (if needed)
+matplotlib
+seaborn
+wordcloud
+umap-learn

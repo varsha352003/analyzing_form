@@ -1,0 +1,136 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f0fdf4; 
+}
+
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background-color: #ffffff;
+}
+
+
+.sidebar {
+  width: 220px;
+  background: linear-gradient(to bottom, #b0c7bf, #063f2b);
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sidebar-menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sidebar-menu li:hover {
+  color: #f0fdf4;
+  font-weight: 500;
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  color: #14532d;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-bar {
+  padding: 8px 12px;
+  border: 1px solid #d1fae5;
+  border-radius: 8px;
+  width: 200px;
+}
+
+
+.cards-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.card {
+  flex: 1;
+  background-color: #ecfdf5;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #065f46;
+}
+
+.card h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.card p {
+  font-size: 14px;
+  color: #064d39;
+}
+
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 30px;
+}
+
+.chart-card {
+  background-color: #f0fdf4;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+.chart-card h3 {
+  margin-bottom: 15px;
+  color: #064e3b;
+}

@@ -60,13 +60,7 @@ function FeedbackForm() {
             Your feedback helps us create better learning experiences for everyone. Take a moment to share your thoughts about your recent course.
           </p>
 
-          <ul className="features-list">
-            <li>Anonymous feedback option available</li>
-            <li>Course-wise comparison and analysis</li>
-            <li>Sentiment analysis for better insights</li>
-            <li>Time-based trends tracking</li>
-            <li>Keyword extraction for improvement areas</li>
-          </ul>
+          
 
           <div className="data-info">
             <h3>How We Use Your Feedback</h3>
