@@ -1,5 +1,5 @@
 # Student Feedback Analysis Dashboard
-An intelligent web application designed to help educational institutions analyze and understand student feedback at scale. This dashboard leverages advanced Natural Language Processing (NLP) to move beyond simple ratings, uncovering hidden themes, topics, and sentiment from qualitative feedback to provide actionable insights for course improvement.
+An intelligent web application designed to help educational institutions analyze and understand student feedback at scale. This dashboard leverages Generative AI and Large Language Models (LLMs) to move beyond simple ratings, using advanced NLP techniques to uncover hidden themes and sentiment from qualitative feedback. By automatically generating human-readable topic labels and insightful summaries, it provides actionable insights for course improvement.
 
 ## ✨ Key Features
 AI-Powered Topic Modeling: Automatically discovers and groups recurring themes and topics from thousands of feedback entries. It uses BERTopic and Large Language Models (llama-3.3-70b-versatile via Groq) to generate concise, human-readable topic labels.
@@ -40,15 +40,7 @@ Library: React.js
 Styling: Plain CSS with a professional green and white theme.
 
 ## Project Structure
-analyzing_feedback/
-├── app.py                    # Flask application
-├── utils/
-│   └── nlp_feedback_analysis.py  # NLP processing utilities
-├── static/
-│   └── react_dashboard/      # React frontend
-├── templates/                # Flask templates
-├── requirements.txt          # Python dependencies
-└── README.md                # Project documentation
+<img width="665" height="259" alt="image" src="https://github.com/user-attachments/assets/bcfdf2d1-c7ef-4e3a-91c6-b38d2e6f8d94" />
 
 ## Running the Application
 1. Start Flask Backend
@@ -63,3 +55,4 @@ analyzing_feedback/
 -LangChain
 -React.js
 -Flask
+
